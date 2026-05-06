@@ -54,6 +54,14 @@ export function createGroup(groupData) {
   });
 }
 
+export function getSessions(groupId) {
+  return request(`/sessions?groupId=${groupId}`);
+}
+
+export function getTasks(groupId) {
+  return request(`/tasks?groupId=${groupId}`);
+}
+
 export function createSession(sessionData) {
   return request("/sessions", {
     method: "POST",

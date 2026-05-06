@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Container,
   Grid,
@@ -5,14 +6,40 @@ import {
   CardContent,
   Typography,
   Button,
+  Alert,
+  CircularProgress,
   Box,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { getGroups } from "../services/api";
 
 function Dashboard() {
-  const groups = ["Web Technologies", "Database Systems", "Algorithms"];
-  const sessions = ["React UI Practice - Monday 6pm", "MongoDB Revision - Wednesday 7pm"];
-  const tasks = ["Finish homepage design", "Prepare client-side validation", "Review MUI layout"];
+  const [groups, setGroups] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        const data = await getGroups();
+        setGroups(data.groups || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Container sx={{ mt: 8, textAlign: "center" }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ mt: 6 }}>
@@ -21,8 +48,14 @@ function Dashboard() {
       </Typography>
 
       <Typography variant="body1" sx={{ mb: 4 }}>
-        Welcome back. Here is an overview of your study groups, sessions and tasks.
+        Welcome back. Here is your StudySync overview.
       </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
@@ -32,13 +65,24 @@ function Dashboard() {
                 My Study Groups
               </Typography>
 
-              {groups.map((group, index) => (
-                <Typography key={index} sx={{ mb: 1 }}>
-                  {group}
+              {groups.length === 0 ? (
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  You have not created or joined any study groups yet.
                 </Typography>
-              ))}
+              ) : (
+                groups.map((group) => (
+                  <Typography key={group._id} sx={{ mb: 1 }}>
+                    {group.name}
+                  </Typography>
+                ))
+              )}
 
-              <Button component={Link} to="/groups" variant="contained" sx={{ mt: 2 }}>
+              <Button
+                component={Link}
+                to="/groups"
+                variant="contained"
+                sx={{ mt: 2 }}
+              >
                 View Groups
               </Button>
             </CardContent>
@@ -52,13 +96,16 @@ function Dashboard() {
                 Upcoming Sessions
               </Typography>
 
-              {sessions.map((session, index) => (
-                <Typography key={index} sx={{ mb: 1 }}>
-                  {session}
-                </Typography>
-              ))}
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Sessions will appear here after you create them inside a group.
+              </Typography>
 
-              <Button component={Link} to="/create-session" variant="contained" sx={{ mt: 2 }}>
+              <Button
+                component={Link}
+                to="/create-session"
+                variant="contained"
+                sx={{ mt: 2 }}
+              >
                 Create Session
               </Button>
             </CardContent>
@@ -72,19 +119,28 @@ function Dashboard() {
                 My Tasks
               </Typography>
 
-              {tasks.map((task, index) => (
-                <Typography key={index} sx={{ mb: 1 }}>
-                  {task}
-                </Typography>
-              ))}
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Tasks will appear here after you add them to a study group.
+              </Typography>
 
-              <Button component={Link} to="/tasks" variant="contained" sx={{ mt: 2 }}>
+              <Button
+                component={Link}
+                to="/tasks"
+                variant="contained"
+                sx={{ mt: 2 }}
+              >
                 View Tasks
               </Button>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      <Box sx={{ mt: 4 }}>
+        <Button component={Link} to="/create-group" variant="outlined">
+          Create Your First Group
+        </Button>
+      </Box>
     </Container>
   );
 }

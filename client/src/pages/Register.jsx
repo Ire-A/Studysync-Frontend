@@ -8,6 +8,7 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
+import { registerUser } from "../services/api";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ function Register() {
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     setSuccess("");
@@ -46,7 +47,18 @@ function Register() {
       return;
     }
 
-    setSuccess("Account details accepted. This will later connect to MongoDB through the backend.");
+    try {
+      const data = await registerUser(formData);
+      setSuccess(data.message);
+
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   return (
@@ -60,8 +72,17 @@ function Register() {
           Create your StudySync account.
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField

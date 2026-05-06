@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -11,13 +12,14 @@ import {
 import { loginUser } from "../services/api";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   function handleChange(event) {
     setFormData({
@@ -29,7 +31,6 @@ function Login() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
-    setSuccess("");
 
     if (!formData.email || !formData.password) {
       setError("Please enter both email and password.");
@@ -42,8 +43,8 @@ function Login() {
     }
 
     try {
-      const data = await loginUser(formData);
-      setSuccess(data.message);
+      await loginUser(formData);
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message);
     }
@@ -57,18 +58,12 @@ function Login() {
         </Typography>
 
         <Typography variant="body2" sx={{ mb: 3 }}>
-          Access your StudySync account.
+          Access your StudySync dashboard.
         </Typography>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
           </Alert>
         )}
 
