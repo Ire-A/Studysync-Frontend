@@ -1,20 +1,39 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Link as MuiLink } from "@mui/material";
+import { Link } from "react-router-dom";
 
 function Footer() {
   return (
     <Box
-      component="footer"
       sx={{
-        mt: 8,
-        py: 3,
-        textAlign: "center",
         backgroundColor: "#5D4037",
         color: "white",
+        py: 3,
+        textAlign: "center",
       }}
     >
-      <Typography variant="body2">
-        &copy; 2026 StudySync | Built for Web Technologies Assignment 3
+      <Typography variant="body2" sx={{ mb: 1 }}>
+        &copy; 2026 StudySync
       </Typography>
+
+      <Box>
+        <MuiLink
+          component={Link}
+          to="/about"
+          color="inherit"
+          sx={{ mx: 1, textDecoration: "none" }}
+        >
+          About Us
+        </MuiLink>
+
+        <MuiLink
+          component={Link}
+          to="/contact"
+          color="inherit"
+          sx={{ mx: 1, textDecoration: "none" }}
+        >
+          Contact Us
+        </MuiLink>
+      </Box>
     </Box>
   );
 }
