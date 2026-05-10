@@ -82,3 +82,15 @@ export function createResource(resourceData) {
     body: JSON.stringify(resourceData),
   });
 }
+
+export function updateTask(taskId, updates) {
+  return request(`/tasks/${taskId}`, {
+    method: "PUT",
+    body: JSON.stringify(updates),
+  });
+}
+
+
+export function getResources(groupId) {
+  return request(`/resources?groupId=${groupId}`);
+}

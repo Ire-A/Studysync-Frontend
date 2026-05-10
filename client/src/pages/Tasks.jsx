@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -12,65 +13,146 @@ import {
   ListItemText,
   Checkbox,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
+import { getGroups, getTasks, createTask, updateTask } from "../services/api";
+
+// Helper to format date for input field
+const formatDateForInput = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toISOString().slice(0, 16); // "YYYY-MM-DDThh:mm"
+};
 
 function Tasks() {
-  const [tasks, setTasks] = useState([
-    { title: "Finish UI design", group: "Web Technologies", completed: false },
-    { title: "Prepare React components", group: "Web Technologies", completed: true },
-  ]);
-
-  const [formData, setFormData] = useState({
-    title: "",
-    group: "",
-    deadline: "",
-  });
-
+  const navigate = useNavigate();
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const groups = ["Web Technologies", "Database Systems", "Algorithms"];
+  // Form state for new task
+  const [formData, setFormData] = useState({
+    title: "",
+    deadline: "",
+  });
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleChange(event) {
+  // Auth check
+  useEffect(() => {
+    const user = localStorage.getItem("studysyncUser");
+    if (!user) navigate("/login");
+  }, [navigate]);
+
+  // Fetch user's groups
+  useEffect(() => {
+    async function fetchGroups() {
+      try {
+        const data = await getGroups();
+        setGroups(data.groups || []);
+        if (data.groups && data.groups.length > 0) {
+          setSelectedGroup(data.groups[0]._id); // auto-select first group
+        }
+      } catch (err) {
+        setError(err.message);
+        if (err.message.includes("Unauthorised")) navigate("/login");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchGroups();
+  }, [navigate]);
+
+  // Fetch tasks whenever selected group changes
+  useEffect(() => {
+    if (!selectedGroup) return;
+    async function fetchTasks() {
+      try {
+        setLoading(true);
+        const data = await getTasks(selectedGroup);
+        setTasks(data.tasks || []);
+        setError("");
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTasks();
+  }, [selectedGroup]);
+
+  const handleGroupChange = (event) => {
+    setSelectedGroup(event.target.value);
+  };
+
+  const handleFormChange = (event) => {
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
     });
-  }
+  };
 
-  function handleAddTask(event) {
-    event.preventDefault();
-    setError("");
-
-    if (!formData.title || !formData.group) {
-      setError("Task title and study group are required.");
-      return;
+  // Client-side validation before POST
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      setFormError("Task title is required.");
+      return false;
     }
-
     if (formData.deadline && new Date(formData.deadline) < new Date()) {
-      setError("Deadline cannot be in the past.");
+      setFormError("Deadline cannot be in the past.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddTask = async (event) => {
+    event.preventDefault();
+    setFormError("");
+
+    if (!validateForm()) return;
+    if (!selectedGroup) {
+      setFormError("Please select a study group first.");
       return;
     }
 
-    setTasks([
-      ...tasks,
-      {
+    setSubmitting(true);
+    try {
+      await createTask({
         title: formData.title,
-        group: formData.group,
-        completed: false,
-      },
-    ]);
+        groupId: selectedGroup,
+        deadline: formData.deadline || null,
+      });
+      // Refresh task list
+      const updatedTasks = await getTasks(selectedGroup);
+      setTasks(updatedTasks.tasks || []);
+      setFormData({ title: "", deadline: "" });
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    setFormData({
-      title: "",
-      group: "",
-      deadline: "",
-    });
-  }
+  // Toggle task completion – calls PUT /api/tasks/:id
+  const toggleTaskCompletion = async (taskId, currentStatus) => {
+    try {
+      await updateTask(taskId, { completed: !currentStatus });
+      // Refresh list
+      const updatedTasks = await getTasks(selectedGroup);
+      setTasks(updatedTasks.tasks || []);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-  function toggleTask(index) {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].completed = !updatedTasks[index].completed;
-    setTasks(updatedTasks);
+  if (loading && groups.length === 0) {
+    return (
+      <Container sx={{ mt: 8, textAlign: "center" }}>
+        <CircularProgress />
+      </Container>
+    );
   }
 
   return (
@@ -79,17 +161,39 @@ function Tasks() {
         Task Management
       </Typography>
 
-      <Typography variant="body1" sx={{ mb: 3 }}>
-        Add coursework tasks and mark them as completed.
-      </Typography>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
+      {/* Group selector */}
+      <Paper elevation={2} sx={{ p: 3, borderRadius: 4, mb: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Select Study Group
+        </Typography>
+        <TextField
+          select
+          fullWidth
+          value={selectedGroup}
+          onChange={handleGroupChange}
+          disabled={loading || groups.length === 0}
+        >
+          {groups.map((group) => (
+            <MenuItem key={group._id} value={group._id}>
+              {group.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        {groups.length === 0 && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            You are not a member of any group. Create or join a group first.
+          </Typography>
+        )}
+      </Paper>
+
+      {/* Add new task form */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 4, mb: 4 }}>
         <Typography variant="h6" gutterBottom>
           Add New Task
         </Typography>
-
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
+        {formError && <Alert severity="error" sx={{ mb: 2 }}>{formError}</Alert>}
         <Box component="form" onSubmit={handleAddTask}>
           <TextField
             fullWidth
@@ -97,65 +201,64 @@ function Tasks() {
             name="title"
             margin="normal"
             value={formData.title}
-            onChange={handleChange}
+            onChange={handleFormChange}
+            disabled={submitting || !selectedGroup}
+            required
           />
-
-          <TextField
-            select
-            fullWidth
-            label="Study Group"
-            name="group"
-            margin="normal"
-            value={formData.group}
-            onChange={handleChange}
-          >
-            {groups.map((group) => (
-              <MenuItem key={group} value={group}>
-                {group}
-              </MenuItem>
-            ))}
-          </TextField>
-
           <TextField
             fullWidth
             label="Deadline"
             name="deadline"
-            type="date"
+            type="datetime-local"
             margin="normal"
             InputLabelProps={{ shrink: true }}
             value={formData.deadline}
-            onChange={handleChange}
+            onChange={handleFormChange}
+            disabled={submitting || !selectedGroup}
           />
-
-          <Button type="submit" variant="contained" sx={{ mt: 3 }}>
-            Add Task
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3 }}
+            disabled={submitting || !selectedGroup}
+          >
+            {submitting ? <CircularProgress size={24} /> : "Add Task"}
           </Button>
         </Box>
       </Paper>
 
+      {/* Task list */}
       <Paper elevation={2} sx={{ p: 3, borderRadius: 4 }}>
         <Typography variant="h6" gutterBottom>
           Current Tasks
         </Typography>
-
-        <List>
-          {tasks.map((task, index) => (
-            <ListItem key={index}>
-              <Checkbox
-                checked={task.completed}
-                onChange={() => toggleTask(index)}
-              />
-
-              <ListItemText
-                primary={task.title}
-                secondary={task.group}
-                sx={{
-                  textDecoration: task.completed ? "line-through" : "none",
-                }}
-              />
-            </ListItem>
-          ))}
-        </List>
+        {loading ? (
+          <CircularProgress />
+        ) : tasks.length === 0 ? (
+          <Typography>No tasks yet. Add one above.</Typography>
+        ) : (
+          <List>
+            {tasks.map((task) => (
+              <ListItem key={task._id}>
+                <Checkbox
+                  checked={task.completed}
+                  onChange={() => toggleTaskCompletion(task._id, task.completed)}
+                />
+                <ListItemText
+                  primary={task.title}
+                  secondary={
+                    task.deadline
+                      ? `Deadline: ${new Date(task.deadline).toLocaleString()}`
+                      : "No deadline"
+                  }
+                  sx={{
+                    textDecoration: task.completed ? "line-through" : "none",
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Paper>
     </Container>
   );
