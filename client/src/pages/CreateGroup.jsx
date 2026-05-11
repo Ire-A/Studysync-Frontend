@@ -1,15 +1,9 @@
+// CreateGroup.jsx, Form to create a new study group
+// Submits group name and description to the backend, then redirects to the groups list.
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
+import { Container, Paper, Typography, TextField, Button, Box, Alert, CircularProgress, } from "@mui/material";
 import { createGroup } from "../services/api";
 
 function CreateGroup() {
@@ -20,7 +14,8 @@ function CreateGroup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Client-side validation before sending to API
+  // Validate input before sending to API.
+  // We require a name and at least 10 characters for description to encourage meaningful descriptions.
   const validate = () => {
     if (!groupName.trim()) {
       setError("Group name is required.");
@@ -42,13 +37,12 @@ function CreateGroup() {
 
     setLoading(true);
     try {
-      // POST /api/groups with name and description
       const response = await createGroup({ name: groupName, description });
       setSuccess(response.message || "Group created successfully!");
       // Clear form after success
       setGroupName("");
       setDescription("");
-      // Optionally redirect after a short delay so user sees success message
+      // Give user time to see the success message, then go to groups overview.
       setTimeout(() => navigate("/groups"), 1500);
     } catch (err) {
       setError(err.message);
@@ -67,18 +61,11 @@ function CreateGroup() {
           Create Study Group
         </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
-          </Alert>
-        )}
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
         <Box component="form" onSubmit={handleSubmit}>
+          {/* Group name, required, disabled during submission */}
           <TextField
             fullWidth
             label="Group Name"
@@ -88,6 +75,7 @@ function CreateGroup() {
             disabled={loading}
             required
           />
+          {/* Description, multiline with helper text enforcing min length */}
           <TextField
             fullWidth
             label="Description"
@@ -99,6 +87,7 @@ function CreateGroup() {
             disabled={loading}
             helperText="At least 10 characters"
           />
+          {/* Submit button, text changes to spinner when loading */}
           <Button
             fullWidth
             type="submit"

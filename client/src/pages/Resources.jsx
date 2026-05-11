@@ -1,18 +1,10 @@
+// Resources.jsx, Allows users to share and view resources (links or notes) within a selected study group.
+// Resources are fetched from the backend, and new ones are created with client‑side URL validation.
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  Typography,
-  Paper,
-  TextField,
-  Button,
-  Box,
-  Alert,
-  MenuItem,
-  Card,
-  CardContent,
-  Grid,
-  CircularProgress,
+import { Container, Typography, Paper, TextField, Button, Box, Alert,
+  MenuItem, Card, CardContent, Grid, CircularProgress,
 } from "@mui/material";
 import { getGroups, getResources, createResource } from "../services/api";
 
@@ -24,7 +16,7 @@ function Resources() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Form state
+  // Form state for adding a new resource.
   const [formData, setFormData] = useState({
     title: "",
     type: "link",
@@ -33,13 +25,13 @@ function Resources() {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Auth check
+  // Auth check – redirect if not logged in.
   useEffect(() => {
     const user = localStorage.getItem("studysyncUser");
     if (!user) navigate("/login");
   }, [navigate]);
 
-  // Fetch groups
+  // Fetch groups the user belongs to and auto‑select the first one.
   useEffect(() => {
     async function fetchGroups() {
       try {
@@ -58,7 +50,7 @@ function Resources() {
     fetchGroups();
   }, [navigate]);
 
-  // Fetch resources when group changes
+  // Fetch resources whenever the selected group changes.
   useEffect(() => {
     if (!selectedGroup) return;
     async function fetchResources() {
@@ -86,7 +78,7 @@ function Resources() {
     });
   };
 
-  // URL validation helper
+  // URL validation, tries to construct a URL object; if it fails, the URL is invalid.
   const isValidUrl = (value) => {
     try {
       new URL(value);
@@ -130,9 +122,10 @@ function Resources() {
         type: formData.type,
         content: formData.content,
       });
-      // Refresh list
+      // Refresh the resource list after successful creation.
       const updated = await getResources(selectedGroup);
       setResources(updated.resources || []);
+      // Reset the form.
       setFormData({ title: "", type: "link", content: "" });
     } catch (err) {
       setFormError(err.message);
@@ -236,7 +229,7 @@ function Resources() {
         </Box>
       </Paper>
 
-      {/* Resources list */}
+      {/* Resources list, displayed as a responsive grid */}
       <Grid container spacing={3}>
         {loading ? (
           <CircularProgress />
@@ -252,13 +245,13 @@ function Resources() {
                     Type: {resource.type}
                   </Typography>
                   <Typography variant="body1" sx={{ wordBreak: "break-word" }}>
-                      {resource.type === "link" ? (
-                        <a href={resource.content} target="_blank" rel="noopener noreferrer">
-                          {resource.content}
-                        </a>
-                        ) : (
-                          resource.content
-                        )}
+                    {resource.type === "link" ? (
+                      <a href={resource.content} target="_blank" rel="noopener noreferrer">
+                        {resource.content}
+                      </a>
+                    ) : (
+                      resource.content
+                    )}
                   </Typography>
                 </CardContent>
               </Card>
@@ -268,5 +261,6 @@ function Resources() {
       </Grid>
     </Container>
   );
-}            
+}
+
 export default Resources;

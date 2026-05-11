@@ -1,8 +1,14 @@
+// Login.jsx, Handles user authentication via email and password.
+// On success, stores the user object in localStorage, fires a custom event for the Navbar,
+// and redirects to the dashboard.
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Box, Button, Container, TextField, Typography, Alert } from "@mui/material";
 import { loginUser } from "../services/api";
 
+/* Shared TextField styles, defined outside the component to avoid recreating the object on every render. The colours match the warm brown palette
+   used across the app (taupe border, walnut on focus). */
 const inputSx = {
   mb: 2.5,
   "& .MuiOutlinedInput-root": {
@@ -17,9 +23,14 @@ const inputSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#5D4037" },
 };
 
+/* Main Login component, handles email/password authentication.
+   On success it stores the user object in localStorage, dispatches the
+   studysyncAuthChanged event so the Navbar updates, then redirects to /dashboard.
+*/
 function Login() {
   const navigate = useNavigate();
 
+  // Controlled form state, we track email and password together in one object.
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,6 +38,7 @@ function Login() {
 
   const [error, setError] = useState("");
 
+  // Generic change handler, uses the input's name attribute to update the correct field.
   function handleChange(e) {
     setFormData({
       ...formData,
@@ -34,15 +46,18 @@ function Login() {
     });
   }
 
+  // Form submission, runs client‑side validation before hitting the API.
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
+    // Basic presence check before making a network request.
     if (!formData.email || !formData.password) {
       setError("Please enter both email and password.");
       return;
     }
 
+    // Lightweight email format check the server validates more strictly.
     if (!formData.email.includes("@")) {
       setError("Please enter a valid email address.");
       return;
@@ -51,8 +66,10 @@ function Login() {
     try {
       const data = await loginUser(formData);
 
+      // Persist the returned user object so other components (Navbar, Dashboard) can read it.
       localStorage.setItem("studysyncUser", JSON.stringify(data.user));
 
+      // Notify the Navbar to re‑read localStorage and show the authenticated nav links.
       window.dispatchEvent(new Event("studysyncAuthChanged"));
 
       navigate("/dashboard");
@@ -62,6 +79,7 @@ function Login() {
   }
 
   return (
+    // Full‑viewport gradient background, same palette as the hero on Home.jsx.
     <Box
       sx={{
         minHeight: "100vh",
@@ -72,6 +90,7 @@ function Login() {
         fontFamily: "'Georgia', serif",
         py: 6,
         position: "relative",
+        // Subtle gold glow in the top‑left adds depth without distraction.
         "&::before": {
           content: '""',
           position: "absolute",
@@ -87,6 +106,7 @@ function Login() {
       }}
     >
       <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
+        {/* Brand header, shown above the card so the logo is visible against the gradient. */}
         <Box sx={{ textAlign: "center", mb: 5 }}>
           <Typography
             sx={{
@@ -112,6 +132,7 @@ function Login() {
           </Typography>
         </Box>
 
+        {/* White card, elevated shadow lifts it off the dark background. */}
         <Box
           sx={{
             background: "rgba(255,255,255,0.97)",
@@ -143,6 +164,7 @@ function Login() {
             Access your StudySync dashboard.
           </Typography>
 
+          {/* Error alert, only rendered when there is a message to show. */}
           {error && (
             <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
               {error}
@@ -150,6 +172,8 @@ function Login() {
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
+            {/* We use uppercase labels above each field instead of floating MUI labels,
+                to keep the form consistent with JoinGroup and CreateGroup pages. */}
             <Typography
               sx={{
                 fontFamily: "inherit",
@@ -198,6 +222,7 @@ function Login() {
               sx={inputSx}
             />
 
+            {/* Submit button, pill‑shaped to match the CTA buttons on Home and Navbar. */}
             <Button
               fullWidth
               type="submit"
@@ -222,6 +247,7 @@ function Login() {
             </Button>
           </Box>
 
+          {/* Sign‑up nudge for users who don't have an account yet. */}
           <Typography
             sx={{
               fontFamily: "inherit",

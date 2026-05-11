@@ -1,36 +1,95 @@
+// Contact.jsx, Contact page with a demo message form
+// Users can send feedback 
+// Provides contact info and a simple form.
+
 import { useState } from "react";
-import { Box, Button, Container, TextField, Typography, Alert } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Alert,
+} from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import SchoolIcon from "@mui/icons-material/School";
+import SendIcon from "@mui/icons-material/Send";
 
 function Contact() {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState("");
 
-  function handleSubmit(e) {
+  // Handle form submission
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim()) return; // client-side validation: prevent empty messages
     setSuccess("Message sent successfully (demo only).");
     setMessage("");
-  }
+  };
 
   return (
-    <Box sx={{ background: "#FAF7F5", minHeight: "100vh", py: { xs: 8, md: 12 }, fontFamily: "'Georgia', serif" }}>
+    <Box
+      sx={{
+        background: "#FAF7F5",
+        minHeight: "100vh",
+        py: { xs: 8, md: 12 }, // responsive vertical padding
+        fontFamily: "'Georgia', serif",
+      }}
+    >
       <Container maxWidth="sm">
-
-        {/* Label */}
-        <Box sx={{ display: "inline-flex", px: 2, py: 0.5, mb: 4, borderRadius: "999px", backgroundColor: "#EFEBE9", border: "1px solid #D7CCC8" }}>
-          <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8D6E63", fontFamily: "inherit" }}>
+        {/* Page label, consistent with About page because they are the two static pages we created */}
+        <Box
+          sx={{
+            display: "inline-flex",
+            px: 2,
+            py: 0.5,
+            mb: 4,
+            borderRadius: "999px",
+            backgroundColor: "#EFEBE9",
+            border: "1px solid #D7CCC8",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#8D6E63",
+              fontFamily: "inherit",
+            }}
+          >
             Contact
           </Typography>
         </Box>
 
-        <Typography variant="h2" sx={{ fontFamily: "inherit", fontWeight: 700, fontSize: { xs: "2rem", md: "2.8rem" }, color: "#3E2723", letterSpacing: "-0.02em", mb: 1, lineHeight: 1.15 }}>
+        {/* Headline */}
+        <Typography
+          variant="h2"
+          sx={{
+            fontFamily: "inherit",
+            fontWeight: 700,
+            fontSize: { xs: "2rem", md: "2.8rem" },
+            color: "#3E2723",
+            letterSpacing: "-0.02em",
+            mb: 1,
+            lineHeight: 1.15,
+          }}
+        >
           Get in touch
         </Typography>
-        <Typography sx={{ fontFamily: "inherit", color: "#795548", mb: 6, lineHeight: 1.7 }}>
+        <Typography
+          sx={{
+            fontFamily: "inherit",
+            color: "#795548",
+            mb: 6,
+            lineHeight: 1.7,
+          }}
+        >
           Have a question or feedback? Send us a message.
         </Typography>
 
-        {/* Form card */}
+        {/* Form card, with a subtle fade‑up animation */}
         <Box
           sx={{
             borderRadius: 4,
@@ -62,7 +121,17 @@ function Contact() {
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
-            <Typography sx={{ fontFamily: "inherit", fontWeight: 700, fontSize: "0.8rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "#8D6E63", mb: 1 }}>
+            <Typography
+              sx={{
+                fontFamily: "inherit",
+                fontWeight: 700,
+                fontSize: "0.8rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#8D6E63",
+                mb: 1,
+              }}
+            >
               Your message
             </Typography>
             <TextField
@@ -88,6 +157,7 @@ function Contact() {
             <Button
               type="submit"
               variant="contained"
+              endIcon={<SendIcon />} // MUI icon for send action
               sx={{
                 backgroundColor: "#5D4037",
                 color: "#fff",
@@ -98,7 +168,10 @@ function Contact() {
                 py: 1.5,
                 fontSize: "0.95rem",
                 boxShadow: "0 4px 16px rgba(93,64,55,0.25)",
-                "&:hover": { backgroundColor: "#3E2723", transform: "translateY(-1px)" },
+                "&:hover": {
+                  backgroundColor: "#3E2723",
+                  transform: "translateY(-1px)",
+                },
                 transition: "all 0.2s ease",
               }}
             >
@@ -107,21 +180,60 @@ function Contact() {
           </Box>
         </Box>
 
-        {/* Decorative info strip */}
+        {/* Decorative info strip we used MUI icons because it is easier and looks better */}
         <Box sx={{ display: "flex", gap: 4, mt: 5, flexWrap: "wrap" }}>
-          {[{ icon: "📧", label: "Email", value: "hello@studysync.ie" }, { icon: "🏫", label: "College", value: "Griffith College Dublin" }].map(({ icon, label, value }) => (
-            <Box key={label} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Box sx={{ width: 38, height: 38, borderRadius: 2, backgroundColor: "#EFEBE9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem" }}>
+          {[
+            { icon: <EmailIcon />, label: "Email", value: "hello@studysync.ie" },
+            { icon: <SchoolIcon />, label: "College", value: "Griffith College Dublin" },
+          ].map(({ icon, label, value }) => (
+            <Box
+              key={label}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 2,
+                  backgroundColor: "#EFEBE9",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#5D4037", // icon colour
+                }}
+              >
                 {icon}
               </Box>
               <Box>
-                <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#A1887F", fontFamily: "inherit" }}>{label}</Typography>
-                <Typography sx={{ fontSize: "0.88rem", color: "#3E2723", fontFamily: "inherit" }}>{value}</Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    color: "#A1887F",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {label}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.88rem",
+                    color: "#3E2723",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {value}
+                </Typography>
               </Box>
             </Box>
           ))}
         </Box>
-
       </Container>
     </Box>
   );

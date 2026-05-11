@@ -94,3 +94,13 @@ export function updateTask(taskId, updates) {
 export function getResources(groupId) {
   return request(`/resources?groupId=${groupId}`);
 }
+
+// Add to services/api.js
+export function getGroupById(groupId) {
+  // Since our backend doesn't have /groups/:id, we decided to fetch all and filter client-side
+  return request("/groups").then(data => {
+    const group = data.groups?.find(g => g._id === groupId);
+    if (!group) throw new Error("Group not found");
+    return group;
+  });
+}

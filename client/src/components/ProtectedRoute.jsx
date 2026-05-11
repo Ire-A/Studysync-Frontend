@@ -10,11 +10,11 @@ function ProtectedRoute({ children }) {
   const user = localStorage.getItem("studysyncUser");
 
   if (!user) {
-    // Not logged in – redirect to login page
+    // Not logged in, redirect to login page
     return <Navigate to="/login" replace />;
   }
 
-  // Logged in – render the requested page
+  // Logged in, render the requested page
   return children;
 }
 

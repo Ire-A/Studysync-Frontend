@@ -1,21 +1,15 @@
+// CreateSession.jsx, Form to schedule a new study session
+// This component lets users select a group, enter session details, and submit to the backend.
+// It includes client‑side validation and shows loading/error states.
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  Alert,
-  MenuItem,
-  CircularProgress,
-} from "@mui/material";
+import { Container, Paper, Typography, TextField, Button, Box, Alert, MenuItem, CircularProgress, } from "@mui/material";
 import { getGroups, createSession } from "../services/api";
 
 function CreateSession() {
   const navigate = useNavigate();
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState([]);           // user's study groups
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -28,7 +22,8 @@ function CreateSession() {
     description: "",
   });
 
-  // Auth check and fetch groups
+  // 1. Check if user is logged in; if not, redirect to login.
+  // 2. Fetch all groups the user belongs to, then pre‑select the first one.
   useEffect(() => {
     const user = localStorage.getItem("studysyncUser");
     if (!user) navigate("/login");
@@ -57,6 +52,8 @@ function CreateSession() {
     });
   };
 
+  // Client‑side validation: ensures all required fields are present
+  // and that the session date is not in the past.
   const validateForm = () => {
     if (!formData.groupId) {
       setError("Please select a study group.");
@@ -78,6 +75,7 @@ function CreateSession() {
     return true;
   };
 
+  // Submit the form, calls backend API and shows success/error feedback.
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
@@ -94,13 +92,13 @@ function CreateSession() {
         description: formData.description || "",
       });
       setSuccess("Study session created successfully!");
+      // Clear only the variable fields, keep the groupId selected
       setFormData({
         ...formData,
         title: "",
         date: "",
         description: "",
       });
-      // Keep groupId selected
     } catch (err) {
       setError(err.message);
     } finally {
@@ -117,89 +115,100 @@ function CreateSession() {
   }
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Create Study Session
-        </Typography>
+  // Outer container with max width sm (small) to keep form readable on large screens
+  <Container maxWidth="sm">
+    {/* Paper component creates a card-like surface with elevation and rounded corners */}
+    <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 4 }}>
+      {/* Page title */}
+      <Typography variant="h4" gutterBottom>
+        Create Study Session
+      </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+      {/* Error and success alerts, shown conditionally */}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-        {groups.length === 0 ? (
-          <Alert severity="warning">
-            You are not a member of any group. Please create or join a group first.
-          </Alert>
-        ) : (
-          <Box component="form" onSubmit={handleSubmit}>
-            <TextField
-              select
-              fullWidth
-              label="Study Group"
-              name="groupId"
-              margin="normal"
-              value={formData.groupId}
-              onChange={handleChange}
-              disabled={submitting}
-              required
-            >
-              {groups.map((group) => (
-                <MenuItem key={group._id} value={group._id}>
-                  {group.name}
-                </MenuItem>
-              ))}
-            </TextField>
+      {/* If user has no groups, show a warning instead of the form */}
+      {groups.length === 0 ? (
+        <Alert severity="warning">
+          You are not a member of any group. Please create or join a group first.
+        </Alert>
+      ) : (
+        // Form, handles submission; prevents default browser behaviour
+        <Box component="form" onSubmit={handleSubmit}>
+          {/* Group selector, we made it a dropdown populated from the groups array */}
+          <TextField
+            select
+            fullWidth
+            label="Study Group"
+            name="groupId"
+            margin="normal"
+            value={formData.groupId}
+            onChange={handleChange}
+            disabled={submitting}
+            required
+          >
+            {groups.map((group) => (
+              <MenuItem key={group._id} value={group._id}>
+                {group.name}
+              </MenuItem>
+            ))}
+          </TextField>
 
-            <TextField
-              fullWidth
-              label="Session Title"
-              name="title"
-              margin="normal"
-              value={formData.title}
-              onChange={handleChange}
-              disabled={submitting}
-              required
-            />
+          {/* Session title, plain text input */}
+          <TextField
+            fullWidth
+            label="Session Title"
+            name="title"
+            margin="normal"
+            value={formData.title}
+            onChange={handleChange}
+            disabled={submitting}
+            required
+          />
 
-            <TextField
-              fullWidth
-              name="date"
-              label="Date & Time"
-              type="datetime-local"
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              value={formData.date}
-              onChange={handleChange}
-              disabled={submitting}
-              required
-            />
+          {/* Date & time picker, uses native datetime-local input */}
+          <TextField
+            fullWidth
+            name="date"
+            label="Date & Time"
+            type="datetime-local"
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            value={formData.date}
+            onChange={handleChange}
+            disabled={submitting}
+            required
+          />
 
-            <TextField
-              fullWidth
-              label="Description or Meeting Link"
-              name="description"
-              margin="normal"
-              multiline
-              rows={4}
-              value={formData.description}
-              onChange={handleChange}
-              disabled={submitting}
-            />
+          {/* Optional description, multiline text area */}
+          <TextField
+            fullWidth
+            label="Description or Meeting Link"
+            name="description"
+            margin="normal"
+            multiline
+            rows={4}
+            value={formData.description}
+            onChange={handleChange}
+            disabled={submitting}
+          />
 
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              sx={{ mt: 3 }}
-              disabled={submitting}
-            >
-              {submitting ? <CircularProgress size={24} /> : "Create Session"}
-            </Button>
-          </Box>
-        )}
-      </Paper>
-    </Container>
-  );
+          {/* Submit button, shows spinner while submitting */}
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3 }}
+            disabled={submitting}
+          >
+            {submitting ? <CircularProgress size={24} /> : "Create Session"}
+          </Button>
+        </Box>
+      )}
+    </Paper>
+  </Container>
+);
 }
 
 export default CreateSession;
