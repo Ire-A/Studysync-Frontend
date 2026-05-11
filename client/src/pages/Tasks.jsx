@@ -12,8 +12,7 @@ import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { getGroups, getTasks, createTask, updateTask } from "../services/api";
 
-/* Palette tokens,same warm brown set used across Dashboard, Groups, and JoinGroup.
-   Every page shares one visual language. */
+/* Palette tokens,same warm brown set used across Dashboard, Groups, and JoinGroup. Every page shares one visual language. */
 const t = {
   espresso: "#3E2723",
   walnut: "#5D4037",
@@ -29,8 +28,8 @@ const t = {
   bgPage: "#FDFAF8",
 };
 
-/* Shared TextField styles – defined outside the component to avoid recreating
-   the object on every render. Matches the input style used in Login.jsx and JoinGroup.jsx. */
+/* Shared TextField styles, we defined outside the component to avoid recreatingthe object on every render. 
+Matches the input style used in Login.jsx and JoinGroup.jsx. */
 const inputSx = {
   "& .MuiOutlinedInput-root": {
     borderRadius: 2.5,
@@ -74,8 +73,7 @@ function FieldLabel({ children }) {
   );
 }
 
-/* TaskCard, displays a single task with its title, deadline, completion status,
-   and a checkbox to toggle completion. Completed tasks are visually dimmed.
+/* TaskCard, displays a single task with its title, deadline, completion status, and a checkbox to toggle completion. Completed tasks are visually dimmed.
    Overdue tasks appear with a red border and a special chip. */
 function TaskCard({ task, onToggle }) {
   const isOverdue =
@@ -167,9 +165,8 @@ function TaskCard({ task, onToggle }) {
   );
 }
 
-/* Main Tasks component – lets users create tasks for a chosen study group and
-   toggle their completion status. Groups are fetched on mount; tasks reload
-   whenever the selected group changes. */
+/* Main Tasks component, lets users create tasks for a chosen study group and toggle their completion status. 
+  Groups are fetched on mount, tasks reload whenever the selected group changes. */
 function Tasks() {
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
@@ -183,7 +180,7 @@ function Tasks() {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Auth check – redirect immediately if no user in localStorage.
+  // Auth check redirect immediately if no user in localStorage.
   useEffect(() => {
     const user = localStorage.getItem("studysyncUser");
     if (!user) navigate("/login");
@@ -230,8 +227,7 @@ function Tasks() {
   const handleFormChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  /* Client‑side validation – runs before the POST so we avoid unnecessary
-     network requests for empty titles or past deadlines. */
+  /* Client‑side validation, runs before the POST so we avoid unnecessary network requests for empty titles or past deadlines. */
   const validateForm = () => {
     if (!formData.title.trim()) {
       setFormError("Task title is required.");
@@ -270,8 +266,7 @@ function Tasks() {
     }
   };
 
-  /* Toggle a task's completed flag – calls PUT /api/tasks/:id with the
-     inverted value, then refreshes the list to reflect the change. */
+  /* Toggle a task's completed flag, calls PUT /api/tasks/:id with the inverted value, then refreshes the list to reflect the change. */
   const toggleTaskCompletion = async (taskId, currentStatus) => {
     try {
       await updateTask(taskId, { completed: !currentStatus });
@@ -300,9 +295,7 @@ function Tasks() {
 
   return (
     <Box sx={{ backgroundColor: t.bgPage, minHeight: "100vh" }}>
-      {/* ===== PAGE BANNER ===== 
-          Gradient background with wave – same pattern as Dashboard and Groups.
-      */}
+      {/*  PAGE BANNER, Gradient background with wave – same pattern as Dashboard and Groups.*/}
       <Box
         sx={{
           background: `linear-gradient(145deg, ${t.espresso} 0%, ${t.mocha} 55%, ${t.taupe} 100%)`,
@@ -383,7 +376,7 @@ function Tasks() {
             Track coursework tasks and mark them off as you go.
           </Typography>
 
-          {/* Stat pills – pending / completed / overdue at a glance. */}
+          {/* Stat pills, pending / completed / overdue at a glance. */}
           <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
             {[
               { value: pendingCount, label: "Pending" },
@@ -473,7 +466,7 @@ function Tasks() {
               </Box>
 
               {groups.length === 0 ? (
-                /* No groups – prompt the user to create or join one. */
+                /* No groups prompt the user to create or join one. */
                 <Box sx={{ textAlign: "center", py: 2 }}>
                   <Typography sx={{ color: t.muted, fontFamily: "'Georgia', serif", fontSize: "0.85rem", mb: 2 }}>
                     You're not in any groups yet.
