@@ -80,3 +80,4 @@ All protected routes (e.g., Dashboard, Groups, Tasks) redirect unauthenticated u
 3. Create a .env file in the root directory
     ```bash
     VITE_API_URL=http://localhost:5000   # or your deployed backend URL
+    

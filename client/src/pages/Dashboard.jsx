@@ -16,8 +16,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { getGroups, getSessions, getTasks } from "../services/api";
 
-/* 
-  Palette tokens, we decided to define colour constants in one place to ensure consistency
+/* Palette tokens, we decided to define colour constants in one place to ensure consistency
   across the entire dashboard. These match the colours we used in Home.jsx.
 */
 const t = {
