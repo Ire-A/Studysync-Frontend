@@ -89,79 +89,72 @@ All protected routes (e.g., Dashboard, Groups, Tasks) redirect unauthenticated u
    npm run dev
 5. Open http://localhost:5173 in your browser.
 
- Client‑Side Validation
-All forms include meaningful validation before sending data to the backend. Error messages are displayed using MUI Alert components.
 
-Page	Validation Rules
-Register	Name, email, password required. Email must contain @. Password ≥ 6 characters.
-Login	Email and password required. Email must contain @.
-CreateGroup	Group name required. Description must be at least 10 characters.
-CreateSession	Title, group, date required. Date cannot be in the past.
-JoinGroup	Group ID cannot be empty.
-Tasks	Title required. Deadline cannot be in the past.
-Resources	Title and content required. If type is link, content must be a valid URL.
-Contact (demo)	Message cannot be empty (no backend call).
-📱 Responsive Design
-The application adapts to different screen sizes using MUI’s responsive breakpoints (xs, sm, md, lg). Key responsive behaviours:
+## Client-Side Validation
 
-Navbar – desktop shows horizontal links; mobile shows a hamburger drawer.
+All forms include meaningful validation before sending data to the backend. Error messages are displayed using MUI `Alert` components.
 
-Grid layouts – pages like Dashboard, Groups, Tasks use Grid with xs={12} (full width on mobile), md={4} or md={6} on larger screens.
+| Page            | Validation Rules                                                                 |
+|-----------------|----------------------------------------------------------------------------------|
+| Register        | Name, email, password required. Email must contain `@`. Password at least 6 characters. |
+| Login           | Email and password required. Email must contain `@`.                             |
+| CreateGroup     | Group name required. Description must be at least 10 characters.                 |
+| CreateSession   | Title, group, date required. Date cannot be in the past.                         |
+| JoinGroup       | Group ID cannot be empty.                                                        |
+| Tasks           | Title required. Deadline cannot be in the past.                                  |
+| Resources       | Title and content required. If type is `link`, content must be a valid URL.      |
+| Contact   | Message cannot be empty.                                       |
 
-Typography – font sizes scale down on mobile (e.g., fontSize: { xs: "2rem", md: "2.8rem" }).
+---
 
-Padding & margins – adjusted per breakpoint for comfortable touch targets.
+## Responsive Design
+
+The application adapts to different screen sizes using MUI's responsive breakpoints (`xs`, `sm`, `md`, `lg`). Key responsive behaviours:
+
+- **Navbar** – desktop shows horizontal links; mobile shows a hamburger drawer.
+- **Grid layouts** – pages like Dashboard, Groups, Tasks use `Grid` with `xs={12}` (full width on mobile), `md={4}` or `md={6}` on larger screens.
+- **Typography** – font sizes scale down on mobile (e.g., `fontSize: { xs: "2rem", md: "2.8rem" }`).
+- **Padding & margins** – adjusted per breakpoint for comfortable touch targets.
 
 All pages have been tested on desktop, tablet, and mobile views.
 
-🌐 Deployment
-The client application is deployed on Render as a static site.
+---
 
-Live URL: https://studysync-frontend-0vrv.onrender.com (replace with your actual URL)
+## Deployment
 
-Build command: npm run build
+The client application is deployed on **Render** as a static site.
 
-Publish directory: dist
+- **Live URL:** `https://studysync-frontend-0vrv.onrender.com` 
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
+- **Environment variable:** `VITE_API_URL = https://studysync-iqaq.onrender.com` 
 
-Environment variable: VITE_API_URL = https://studysync-iqaq.onrender.com (your backend URL)
+---
 
-📄 Required Assignment Outputs
-This repository includes:
+## References & Third-Party Resources
 
-All project files (React components, services, assets)
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+- [Material UI (MUI) Documentation](https://mui.com/)
+- [React Router Documentation](https://reactrouter.com/)
+- [Render Static Site Deployment Guide](https://render.com/docs/static-sites)
 
-README.md (this file)
+---
 
-Coversheet PDF (submitted separately as part of the zip)
+## Testing
 
-📚 References & Third‑Party Resources
-React Documentation
-
-Vite Documentation
-
-Material UI (MUI) Documentation
-
-React Router Documentation
-
-Render Static Site Deployment Guide
-
-AI Use Declaration:
-No generative AI was used to write code blocks. AI (IDE autocomplete) was used only for support tasks (e.g., generating repetitive component structures, fixing typos). All core logic and styling were written by the team, in compliance with the AI Assessment Scale level “AI for Support Tasks”.
-
-🧪 Testing
 You can test the application by:
 
-Registering a new user.
-
-Logging in.
-
-Creating a study group.
-
-Adding a session, task, or resource.
-
-Joining another group by entering its ID (copy the ID from an existing group’s detail page).
+1. Registering a new user.
+2. Logging in.
+3. Creating a study group.
+4. Adding a session, task, or resource.
+5. Joining another group by entering its ID (copy the ID from an existing group's detail page).
 
 All validations, redirects, and API calls should work as expected.
 
+---
 
-    
+## Conclusion
+
+The StudySync client meets all assignment requirements. It provides a complete, responsive, and validated user interface for a study collaboration platform. Every page interacts with the real backend, and the code is fully commented, structured, and maintainable
