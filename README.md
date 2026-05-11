@@ -1,9 +1,7 @@
 # StudySync – Client‑Side Application
 
 **Group Name:** StudySync  
-**Application Name:** StudySync Client  
-**Assignment:** WT – Assignment 3 – Client‑side components  
-**Submission Date:** 27/04/2026  
+**Application Name:** StudySync Client   
 
 ---
 
