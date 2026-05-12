@@ -277,7 +277,6 @@ function Navbar() {
                 sx={{
                   px: 3,
                   py: 1.2,
-                  color: isActive(l.to) ? t.gold : "rgba(255,255,255,0.82)",
                   fontFamily: "'Georgia', serif",
                   fontWeight: isActive(l.to) ? 700 : 400,
                   "&:hover": { backgroundColor: "rgba(255,255,255,0.07)" },
@@ -285,7 +284,11 @@ function Navbar() {
               >
                 <ListItemText
                   primary={l.label}
-                  primaryTypographyProps={{ fontFamily: "'Georgia', serif", fontSize: "0.95rem" }}
+                  primaryTypographyProps={{
+                    fontFamily: "'Georgia', serif",
+                    fontSize: "0.95rem",
+                    color: isActive(l.to) ? t.gold : t.white, 
+                  }}
                 />
               </ListItemButton>
             </ListItem>
